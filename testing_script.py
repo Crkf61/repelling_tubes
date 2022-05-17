@@ -60,6 +60,19 @@ def find_repulsion_on_i(pos_i, pos_j, q1, q2):
     r_mag = np.abs(r)
     force = r * q1 * q2 / r_mag**3
     return force
+
+def print_output(positions):
+    rounded_pos = []
+    for pos in positions:
+        rounded = int(pos * 100)
+        rounded_pos.append(rounded)
+    output_str = ""
+    for i in range(100):
+        if i in rounded_pos:
+            output_str += 'O'
+        else:
+            output_str += '-'
+    return output_str
     
 
 def timestep(dt, positions, velocities):
@@ -67,11 +80,5 @@ def timestep(dt, positions, velocities):
     image_positions = find_images(positions)
     forces = find_all_forces(positions, image_positions)
 
-#positions = [0.1, 0.5]
-#images = find_images(positions)
-#print(images)
-
-force = find_repulsion_on_i(0.2,0.1,1,1)
-
-print(force)
-
+newline = print_output([0.1,0.2,0.6])
+print(newline)

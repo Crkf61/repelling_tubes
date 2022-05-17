@@ -54,14 +54,14 @@ def find_repulsion_on_i(pos_i, pos_j, q1, q2):
     force = r * q1 * q2 / r_mag**3 / 3
     return force
 
-def print_output(positions):
+def print_output(positions, width):
     rounded_pos = []
     for i in range(len(positions)):
         pos = positions[i]
-        rounded = int(pos * 100)
+        rounded = int(pos * width)
         rounded_pos.append(rounded)
     output_str = "["
-    for i in range(100):
+    for i in range(width):
         if i in rounded_pos:
             output_str += 'O'
         else:
@@ -99,17 +99,18 @@ def timestep(positions, velocities, length, dt):
 dt = 1/50
 
 length = 1   # gap that particles can move in
+width = 90
 
 q = 1        # charge each particle has
 
 positions = [0.1,0.4,0.6,0.5]
-velocities = [0, 0, 0, 0]
-print_output(positions)
+velocities = [0 for p in positions]
+print_output(positions, width)
 
 while True:
     time.sleep(0.05)
     new_poss, new_vels = timestep(positions, velocities, length, dt)
-    display = print_output(new_poss)
+    display = print_output(new_poss, width)
     print(display, end='\r')
     positions = new_poss.copy()
     velocities = new_vels.copy()

@@ -51,7 +51,7 @@ def find_repulsion_on_i(pos_i, pos_j, q1, q2):
     else:
         r = rin
     r_mag = np.abs(r)
-    force = r * q1 * q2 / r_mag**3
+    force = r * q1 * q2 / r_mag**3 / 3
     return force
 
 def print_output(positions):
@@ -102,8 +102,8 @@ length = 1   # gap that particles can move in
 
 q = 1        # charge each particle has
 
-positions = [0.4, 0.6]
-velocities = [0, 0]
+positions = [0.1,0.4,0.6,0.5]
+velocities = [0, 0, 0, 0]
 print_output(positions)
 
 for time in range(100): # 100 time steps

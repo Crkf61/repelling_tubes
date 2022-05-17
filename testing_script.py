@@ -1,6 +1,6 @@
 # testing file, do it for 4 'electrons' in a line
 
-import pygame, sys
+import pygame, sys, time
 import numpy as np
 
 
@@ -60,13 +60,13 @@ def print_output(positions):
         pos = positions[i]
         rounded = int(pos * 100)
         rounded_pos.append(rounded)
-    output_str = "|"
+    output_str = "["
     for i in range(100):
         if i in rounded_pos:
             output_str += 'O'
         else:
             output_str += ' '
-    output_str += '|'
+    output_str += ']'
     return output_str
     
 def run_physics(positions, velocities, forces, dt):
@@ -106,10 +106,11 @@ positions = [0.1,0.4,0.6,0.5]
 velocities = [0, 0, 0, 0]
 print_output(positions)
 
-for time in range(100): # 100 time steps
+while True:
+    time.sleep(0.05)
     new_poss, new_vels = timestep(positions, velocities, length, dt)
     display = print_output(new_poss)
-    print(display)
+    print(display, end='\r')
     positions = new_poss.copy()
     velocities = new_vels.copy()
 

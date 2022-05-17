@@ -14,7 +14,7 @@ def find_images(positions, length):
         image_positions.append(image_right)
     return image_positions
 
-def find_all_forces(positions, image_positions, velocities, lamb=3):
+def find_all_forces(positions, image_positions, velocities, lamb=10):
     forces = []
     for i in range(len(positions)):
         # iterate over every particle which isn't itself, and every image
@@ -51,7 +51,7 @@ def find_repulsion_on_i(pos_i, pos_j, q1, q2):
     else:
         r = rin
     r_mag = np.abs(r)
-    force = r * q1 * q2 / r_mag**3 / 3
+    force = r * q1 * q2 / r_mag**3
     return force
 
 def print_output(positions, width):
@@ -84,13 +84,35 @@ def run_physics(positions, velocities, forces, dt):
         new_vels.append(new_vel)
     return new_poss, new_vels
 
+def check_pos(positions, velocities, length):
+    clean_pos = []
+    clean_vel = []
+    spacing = 0.06
+    for i in range(len(positions)):
+        pos = positions[i]
+        vel = velocities[i]
+        if pos < length*spacing:
+            new_pos = length*(i+1)*spacing
+            new_vel = 0
+        elif pos > length*(1 - spacing):
+            new_pos = length*(1-(i+1)*spacing)
+            new_vel = 0
+        else:
+            new_pos = pos
+            new_vel = vel
+        clean_pos.append(new_pos)
+        clean_vel.append(new_vel)
+    return clean_pos, clean_vel
+
+
 
 def timestep(positions, velocities, length, dt):
     # calculate forces on each particle
     image_positions = find_images(positions, length)
     forces = find_all_forces(positions, image_positions, velocities) # note forces == accel
     new_positions, new_velocities = run_physics(positions, velocities, forces, dt)
-    return new_positions, new_velocities
+    cleaned_positions, cleaned_vels = check_pos(new_positions, new_velocities, length)
+    return cleaned_positions, cleaned_vels
 
 ############################################################################################
 #####################     END OF FUNCTION DEFINITIONS     ##################################
@@ -103,7 +125,7 @@ width = 90
 
 q = 1        # charge each particle has
 
-positions = [0.1,0.4,0.6,0.5]
+positions = [0.5,0.55, 0.51, 0.53]
 velocities = [0 for p in positions]
 print_output(positions, width)
 

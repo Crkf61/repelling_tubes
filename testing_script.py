@@ -3,25 +3,18 @@
 import pygame, sys
 import numpy as np
 
-dt = 1/50
 
-length = 1   # gap that particles can move in
-
-q = 1        # charge each particle has
-m = 1
-lamb = 0.1     # damping on each particle
-
-def find_images(positions):
+def find_images(positions, length):
     # find location of 'image charges'
     image_positions = []
     for particle_position in positions:
         image_left = -particle_position
-        image_right = 2 - particle_position
+        image_right = 2*length - particle_position
         image_positions.append(image_left)
         image_positions.append(image_right)
     return image_positions
 
-def find_all_forces(positions, image_positions, velocities):
+def find_all_forces(positions, image_positions, velocities, lamb=3):
     forces = []
     for i in range(len(positions)):
         # iterate over every particle which isn't itself, and every image
@@ -41,7 +34,7 @@ def find_all_forces(positions, image_positions, velocities):
         for j in range(len(image_positions)):
             image_j_pos = image_positions[j]
             qj = 1
-            force = find_repulsion(particle_i_pos, image_j_pos, qi, qj)
+            force = find_repulsion_on_i(particle_i_pos, image_j_pos, qi, qj)
             force_i += force
 
         # damping from velocity
@@ -63,22 +56,62 @@ def find_repulsion_on_i(pos_i, pos_j, q1, q2):
 
 def print_output(positions):
     rounded_pos = []
-    for pos in positions:
+    for i in range(len(positions)):
+        pos = positions[i]
         rounded = int(pos * 100)
         rounded_pos.append(rounded)
-    output_str = ""
+    output_str = "|"
     for i in range(100):
         if i in rounded_pos:
             output_str += 'O'
         else:
-            output_str += '-'
+            output_str += ' '
+    output_str += '|'
     return output_str
     
+def run_physics(positions, velocities, forces, dt):
+    no_particles = len(positions)
+    new_poss = []
+    new_vels = []
+    for i in range(no_particles):
+        pos = positions[i]
+        vel = velocities[i]
+        force = forces[i]
+        # use backward euler for stability
+        new_vel = vel + force*dt
+        new_pos = pos + new_vel*dt
+        new_poss.append(new_pos)
+        new_vels.append(new_vel)
+    return new_poss, new_vels
 
-def timestep(dt, positions, velocities):
+
+def timestep(positions, velocities, length, dt):
     # calculate forces on each particle
-    image_positions = find_images(positions)
-    forces = find_all_forces(positions, image_positions)
+    image_positions = find_images(positions, length)
+    forces = find_all_forces(positions, image_positions, velocities) # note forces == accel
+    new_positions, new_velocities = run_physics(positions, velocities, forces, dt)
+    return new_positions, new_velocities
 
-newline = print_output([0.1,0.2,0.6])
-print(newline)
+############################################################################################
+#####################     END OF FUNCTION DEFINITIONS     ##################################
+############################################################################################
+
+dt = 1/50
+
+length = 1   # gap that particles can move in
+
+q = 1        # charge each particle has
+
+positions = [0.4, 0.6]
+velocities = [0, 0]
+print_output(positions)
+
+for time in range(100): # 100 time steps
+    new_poss, new_vels = timestep(positions, velocities, length, dt)
+    display = print_output(new_poss)
+    print(display)
+    positions = new_poss.copy()
+    velocities = new_vels.copy()
+
+    
+

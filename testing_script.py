@@ -33,7 +33,7 @@ def find_all_forces(positions, image_positions, velocities, lamb=3):
         # image particles
         for j in range(len(image_positions)):
             image_j_pos = image_positions[j]
-            qj = 1
+            qj = 2
             force = find_repulsion_on_i(particle_i_pos, image_j_pos, qi, qj)
             force_i += force
 

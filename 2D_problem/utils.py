@@ -10,9 +10,10 @@ def find_images(positions):
         y = particle_pos[1]
         if np.abs(R) < 1e-6:
             R = 1e-6
-            particle_pos[0] += 1   # needed to ensure effect of image from origin
-                                   # particle is negligible
-        image = particle_pos/R**2
+            image = np.array([1,0])/R**2   # needed to ensure effect of image from origin
+                                           # particle is negligible
+        else:
+            image = particle_pos/R**2
         image_positions.append(image)
     return image_positions
 
@@ -22,7 +23,7 @@ def find_all_forces(positions, image_positions, velocities, q, lamb):
         # iterate over every particle which isn't itself, and every image
         particle_i_pos = positions[i]   # the main character particle
         qi = q
-        force_i = np.array([0,0])   # 2D array of forve on particle
+        force_i = np.array([0.,0.])   # 2D array of forve on particle
 
         # real particles
         for j in range(len(positions)):
@@ -35,7 +36,7 @@ def find_all_forces(positions, image_positions, velocities, q, lamb):
         # image particles
         for j in range(len(image_positions)):
             image_j_pos = image_positions[j]
-            qj = 2*q
+            qj = 5*q
             force = find_repulsion_on_i(particle_i_pos, image_j_pos, qi, qj)
             force_i += force
 
@@ -95,7 +96,7 @@ def check_pos(positions, velocities):
         clean_vel.append(new_vel)
     return clean_pos, clean_vel
 
-def timestep(positions, velocities, dt, q=1, lamb=10):
+def timestep(positions, velocities, dt, q=3, lamb=10):
     # calculate forces on each particle
     image_positions = find_images(positions)
     forces = find_all_forces(positions, image_positions, velocities, q, lamb) # forces == accel

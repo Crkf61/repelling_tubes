@@ -1,3 +1,4 @@
+import numpy as np
 import pygame
 import sys
 
@@ -15,13 +16,17 @@ def start_display():
     screen.fill(background_colour)
     return screen, clock
 
-def draw_positions(positions, screen, length):
+def draw_positions(positions, screen):
     # draw circle for 'electrons' to bounce inside
     RAD = SIZE/2
     pygame.draw.circle(screen, shell_colour, (RAD, RAD), RAD)
 
     for pos in positions:
-        screen_pos = np.round(RAD * pos)
+        #print(pos)
+        pos_from_top_left = np.array([1 + pos[0], 1 - pos[1]])
+        #print(pos_from_top_left)
+        screen_pos = np.round(RAD * pos_from_top_left)
+        #print(screen_pos)
         pygame.draw.circle(screen, dot_colour, screen_pos, dot_rad)
 
     pygame.display.update()

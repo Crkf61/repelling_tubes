@@ -1,24 +1,26 @@
+import numpy as np
 import pygame
 import pygame_utils as pg
 import utils as ut
 pygame.init()
 
-dt = 1/240
+dt = 1/120
 display_framerate = 60
 
-length = 1   # gap that particles can move in
-
 # define initial state
-positions = [0.1,0.5]
+list_positions = [[0,0],[0.7,0.1]]
+positions = [np.array(p) for p in list_positions]
+
+
 velocities = [0 for p in positions]
 
 screen, clock = pg.start_display()
 
 while True:
     pg.check_quit()
-    positions, velocities = ut.timestep(positions, velocities, length, dt)
+    positions, velocities = ut.timestep(positions, velocities, dt)
 
-    pg.draw_positions(positions, screen, length)
+    pg.draw_positions(positions, screen)
 
     clock.tick(display_framerate)
 

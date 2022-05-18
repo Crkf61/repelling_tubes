@@ -76,7 +76,7 @@ def run_physics(positions, velocities, forces, dt):
         new_vels.append(new_vel)
     return new_poss, new_vels
 
-def check_pos(positions, velocities, length):
+def check_pos(positions, velocities):
     clean_pos = []
     clean_vel = []
     spacing = 0.01
@@ -95,13 +95,13 @@ def check_pos(positions, velocities, length):
         clean_vel.append(new_vel)
     return clean_pos, clean_vel
 
-def timestep(positions, velocities, length, dt, q=1, lamb=10):
+def timestep(positions, velocities, dt, q=1, lamb=10):
     # calculate forces on each particle
-    image_positions = find_images(positions, length)
+    image_positions = find_images(positions)
     forces = find_all_forces(positions, image_positions, velocities, q, lamb) # forces == accel
     # now integrate eqns of motion to find new positions and velocities
     new_positions, new_velocities = run_physics(positions, velocities, forces, dt)
-    cleaned_positions, cleaned_vels = check_pos(new_positions, new_velocities, length)
+    cleaned_positions, cleaned_vels = check_pos(new_positions, new_velocities)
     return cleaned_positions, cleaned_vels
 
 ###########################################################################################

@@ -1,14 +1,19 @@
 import numpy as np
 
-
-def find_images(positions, length):
-    # find location of 'image charges'
+# positions is an array of [x,y] np arrays
+def find_images(positions):
+    # find location of 'image charges' for unit circle
     image_positions = []
-    for particle_position in positions:
-        image_left = -particle_position
-        image_right = 2*length - particle_position
-        image_positions.append(image_left)
-        image_positions.append(image_right)
+    for particle_pos in positions:
+        R = np.linalg.norm(particle_pos)
+        x = particle_pos[0]
+        y = particle_pos[1]
+        if np.abs(R) < 1e-6:
+            R = 1e-6
+            particle_pos[0] += 1   # needed to ensure effect of image from origin
+                                   # particle is negligible
+        image = particle_pos/R**2
+        image_positions.append(image)
     return image_positions
 
 def find_all_forces(positions, image_positions, velocities, q, lamb):
@@ -17,7 +22,7 @@ def find_all_forces(positions, image_positions, velocities, q, lamb):
         # iterate over every particle which isn't itself, and every image
         particle_i_pos = positions[i]   # the main character particle
         qi = q
-        force_i = 0
+        force_i = np.array([0,0])   # 2D array of forve on particle
 
         # real particles
         for j in range(len(positions)):
@@ -42,39 +47,29 @@ def find_all_forces(positions, image_positions, velocities, q, lamb):
     return forces
 
 def find_repulsion_on_i(pos_i, pos_j, q1, q2):
-    rin = pos_i - pos_j
-    if np.abs(rin) < 1e-4:
-        r = 1e-4
+    rin = pos_i - pos_j  # numpy array
+    rin_mag = np.linalg.norm(rin)
+    if rin_mag < 1e-3:
+        if rin_mag == 0:
+            r = 1e-3*np.array([1,0])
+        else:
+            r = 1e-3*rin / rin_mag
     else:
         r = rin
-    r_mag = np.abs(r)
-    force = r * q1 * q2 / r_mag**3
+    r_mag = np.linalg.norm(r)
+    force = r * q1 * q2 / r_mag**3 # numpy array
     return force
 
-def print_output(positions, width):
-    rounded_pos = []
-    for i in range(len(positions)):
-        pos = positions[i]
-        rounded = int(pos * width)
-        rounded_pos.append(rounded)
-    output_str = "["
-    for i in range(width):
-        if i in rounded_pos:
-            output_str += 'O'
-        else:
-            output_str += ' '
-    output_str += ']'
-    return output_str
-    
 def run_physics(positions, velocities, forces, dt):
+    # integrate eqns of motion
     no_particles = len(positions)
     new_poss = []
     new_vels = []
     for i in range(no_particles):
-        pos = positions[i]
+        pos = positions[i]   # numpy array
         vel = velocities[i]
         force = forces[i]
-        # use backward euler for stability
+        # use forward euler
         new_vel = vel + force*dt
         new_pos = pos + new_vel*dt
         new_poss.append(new_pos)
@@ -84,16 +79,15 @@ def run_physics(positions, velocities, forces, dt):
 def check_pos(positions, velocities, length):
     clean_pos = []
     clean_vel = []
-    spacing = 0.06
+    spacing = 0.01
     for i in range(len(positions)):
         pos = positions[i]
         vel = velocities[i]
-        if pos < length*spacing:
-            new_pos = length*(i+1)*spacing
-            new_vel = 0
-        elif pos > length*(1 - spacing):
-            new_pos = length*(1-(i+1)*spacing)
-            new_vel = 0
+        pos_mag = np.linalg.norm(pos)
+        if pos_mag > 1-spacing:
+            # put back inside unit circle
+            new_pos = (1-2*spacing) * pos / pos_mag
+            new_vel = np.array([0,0])
         else:
             new_pos = pos
             new_vel = vel
@@ -105,8 +99,10 @@ def timestep(positions, velocities, length, dt, q=1, lamb=10):
     # calculate forces on each particle
     image_positions = find_images(positions, length)
     forces = find_all_forces(positions, image_positions, velocities, q, lamb) # forces == accel
+    # now integrate eqns of motion to find new positions and velocities
     new_positions, new_velocities = run_physics(positions, velocities, forces, dt)
     cleaned_positions, cleaned_vels = check_pos(new_positions, new_velocities, length)
     return cleaned_positions, cleaned_vels
 
-
+###########################################################################################
+###########################################################################################

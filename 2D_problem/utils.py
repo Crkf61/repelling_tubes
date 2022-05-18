@@ -111,7 +111,7 @@ def check_pos(positions, velocities):
 
 def timestep(positions, velocities, dt, q0=3, lamb=10):
     n_circles = len(positions)
-    q = q0/np.sqrt(n_circles)
+    q = q0/np.sqrt(np.sqrt(n_circles))
     # calculate forces on each particle
     image_positions = find_images(positions)
     forces = find_all_forces(positions, image_positions, velocities, q, lamb) # forces == accel

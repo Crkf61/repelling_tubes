@@ -1,2 +1,2 @@
 *.swp
-1D_problem/__pycache__/
+*/__pycache__/

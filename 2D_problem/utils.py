@@ -63,11 +63,11 @@ def find_all_forces(positions, image_positions, velocities, q, lamb):
 def find_repulsion_on_i(pos_i, pos_j, q1, q2):
     rin = pos_i - pos_j  # numpy array
     rin_mag = np.linalg.norm(rin)
-    if rin_mag < 1e-3:
+    if rin_mag < 3e-2:
         if rin_mag == 0:
-            r = 1e-3*np.array([1,0])
+            r = 3e-2*np.array([1,0])
         else:
-            r = 1e-3*rin / rin_mag
+            r = 3e-2*rin / rin_mag
     else:
         r = rin
     r_mag = np.linalg.norm(r)

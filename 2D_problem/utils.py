@@ -109,6 +109,44 @@ def check_pos(positions, velocities):
         clean_vel.append(new_vel)
     return clean_pos, clean_vel
 
+def find_maximum(array):
+    maximum = 0
+    for value in array:
+        abs_value = np.linalg.norm(value)
+        if abs_value > maximum:
+            maximum = abs_value
+    return maximum
+
+def average(array):
+    total = 0
+    for value in array:
+        total += value
+    return total / len(array)
+
+def find_pitch(positions):
+    length = len(positions)
+    if length < 2:
+        return 1
+    else:
+        closest_pitches = []
+        
+        for i in range(length):
+            # for each particle
+            closest_distance = 10
+            particle_i_pos = positions[i]
+            for j in range(length):
+                if j != i:
+                    # consider each other particle
+                    distance = np.linalg.norm(particle_i_pos - positions[j])
+                    if distance < closest_distance:
+                        closest_distance = distance
+            closest_pitches.append(closest_distance)
+        # now have full list of closest pitches
+        pitch = average(closest_pitches)
+        return pitch
+        
+
+
 def timestep(positions, velocities, dt, q0=3, lamb=10):
     n_circles = len(positions)
     q = q0/np.sqrt(n_circles)

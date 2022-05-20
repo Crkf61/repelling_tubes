@@ -61,10 +61,20 @@ pitches2 = np.array([1, 0.8488290214657936, 0.885276684556223, 0.788534914535805
 
 pitches = (pitches1 + pitches2) / 2
 
-inv_pitches = 1/pitches
+# inv_pitches = 1/pitches
 n = np.arange(1,30)
-print(n)
+deg = 4
+coeffs = np.polyfit(n, pitches,deg)
+scaled_coeffs = 0.064/2 * coeffs
+print(scaled_coeffs)
+approx_pitch = []
+for value in n:
+    pitch = 0
+    for i in range(deg+1):
+        pitch += coeffs[i]*value**(deg-i)
+    approx_pitch.append(pitch)
 
-plt.plot(n, inv_pitches)
+plt.plot(n, pitches)
+plt.plot(n,approx_pitch)
 plt.show()
 #'''
